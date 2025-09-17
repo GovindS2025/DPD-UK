@@ -1,0 +1,77 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notification-service
+  
+  profiles:
+    active: dev
+  
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+        streams:
+          binder:
+            configuration:
+              default:
+                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value.serde: org.springframework.kafka.support.serializer.JsonSerde
+      bindings:
+        eta-notification-in:
+          destination: eta-calculated
+          contentType: application/json
+        route-notification-in:
+          destination: route-optimized
+          contentType: application/json
+        return-notification-in:
+          destination: return-initiated
+          contentType: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.dpd.uk.notification: DEBUG
+    org.springframework.web.socket: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# WebSocket configuration
+websocket:
+  allowed-origins: "*"
+  max-connections: 1000
+  heartbeat-interval: 30000
+  connection-timeout: 60000
+
+# Notification configuration
+notifications:
+  broadcast:
+    enabled: true
+    batch-size: 100
+    flush-interval: 1000
+  
+  topics:
+    eta-updates: "eta-calculated"
+    route-updates: "route-optimized"
+    return-updates: "return-initiated"
+    system-alerts: "system-alerts"
+  
+  retry:
+    max-attempts: 3
+    backoff-delay: 1000
+    max-backoff-delay: 10000

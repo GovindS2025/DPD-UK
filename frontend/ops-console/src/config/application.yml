@@ -1,0 +1,141 @@
+# Frontend application configuration
+app:
+  name: Logistics Operations Console
+  version: 1.0.0
+  description: Real-time operations console for logistics platform
+  
+  # API configuration
+  api:
+    base-url: ${VITE_API_BASE_URL:http://localhost:8080}
+    timeout: 10000
+    retry-attempts: 3
+    retry-delay: 1000
+  
+  # WebSocket configuration
+  websocket:
+    url: ${VITE_WS_URL:ws://localhost:8084/ws/notifications}
+    reconnect-interval: 5000
+    max-reconnect-attempts: 10
+    heartbeat-interval: 30000
+  
+  # Map configuration
+  map:
+    default-center:
+      lat: 51.5074
+      lng: -0.1278
+    default-zoom: 10
+    max-zoom: 18
+    min-zoom: 3
+    tile-layer: ${VITE_MAP_TILE_LAYER:https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png}
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  
+  # Real-time updates
+  realtime:
+    enabled: true
+    update-interval: 5000
+    max-updates-per-second: 10
+  
+  # Dashboard configuration
+  dashboard:
+    refresh-interval: 30000
+    max-chart-data-points: 100
+    default-time-range: 24h
+  
+  # ETA configuration
+  eta:
+    update-interval: 10000
+    confidence-thresholds:
+      high: 0.9
+      medium: 0.7
+      low: 0.5
+      very-low: 0.3
+  
+  # Route optimization
+  routing:
+    algorithms:
+      - name: Genetic Algorithm
+        value: GENETIC_ALGORITHM
+        description: Best for complex routes with many stops
+      - name: Simulated Annealing
+        value: SIMULATED_ANNEALING
+        description: Good for medium complexity routes
+      - name: Tabu Search
+        value: TABU_SEARCH
+        description: Fast for simple routes
+      - name: Greedy
+        value: GREEDY
+        description: Fastest but less optimal
+    default-algorithm: GENETIC_ALGORITHM
+    max-iterations: 1000
+    population-size: 50
+  
+  # Returns management
+  returns:
+    ttl-warning-hours: 2
+    auto-refresh-interval: 30000
+    status-colors:
+      REQUESTED: '#ffc107'
+      PENDING_APPROVAL: '#fd7e14'
+      APPROVED: '#198754'
+      PICKUP_SCHEDULED: '#0d6efd'
+      PICKED_UP: '#6f42c1'
+      IN_TRANSIT: '#20c997'
+      PROCESSING: '#fd7e14'
+      COMPLETED: '#198754'
+      REJECTED: '#dc3545'
+      EXPIRED: '#6c757d'
+      CANCELLED: '#6c757d'
+  
+  # Notifications
+  notifications:
+    enabled: true
+    types:
+      - ETA_UPDATE
+      - ROUTE_OPTIMIZED
+      - RETURN_APPROVED
+      - RETURN_REJECTED
+      - SYSTEM_ALERT
+    max-notifications: 50
+    auto-dismiss-delay: 5000
+  
+  # Performance
+  performance:
+    lazy-loading: true
+    virtual-scrolling: true
+    debounce-delay: 300
+    throttle-delay: 100
+
+# Environment specific configurations
+environments:
+  development:
+    api:
+      base-url: http://localhost:8080
+    websocket:
+      url: ws://localhost:8084/ws/notifications
+    map:
+      tile-layer: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+    realtime:
+      enabled: true
+      update-interval: 2000
+  
+  production:
+    api:
+      base-url: https://api.logistics.dpd-uk.com
+    websocket:
+      url: wss://api.logistics.dpd-uk.com/ws/notifications
+    map:
+      tile-layer: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+    realtime:
+      enabled: true
+      update-interval: 5000
+  
+  docker:
+    api:
+      base-url: http://api-gateway:8080
+    websocket:
+      url: ws://notification-service:8084/ws/notifications
+    map:
+      tile-layer: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+    realtime:
+      enabled: true
+      update-interval: 5000

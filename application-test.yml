@@ -1,0 +1,97 @@
+# Test environment configuration
+spring:
+  profiles:
+    active: test
+  
+  # Test database configurations
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/logistics_test
+      auto-index-creation: true
+    redis:
+      host: localhost
+      port: 6379
+      database: 1
+      timeout: 1000ms
+      lettuce:
+        pool:
+          max-active: 5
+          max-idle: 5
+          min-idle: 0
+  
+  # Test cloud configuration
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+          replication-factor: 1
+
+# Test logging
+logging:
+  level:
+    com.dpd.uk: DEBUG
+    org.springframework.test: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.data: DEBUG
+    org.springframework.kafka: DEBUG
+    org.apache.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
+
+# Test management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Test application properties
+app:
+  external:
+    traffic:
+      api-key: test-traffic-api-key
+      base-url: https://api.traffic-service-test.com/v1
+      timeout: 2000
+      mock-responses: true
+    
+    mapping:
+      api-key: test-mapping-api-key
+      base-url: https://atlas.microsoft.com/map
+      timeout: 5000
+      mock-responses: true
+  
+  features:
+    eta-calculation:
+      cache-enabled: false
+      debug-mode: true
+      mock-external-apis: true
+    
+    route-optimization:
+      debug-mode: true
+      log-iterations: true
+      mock-external-apis: true
+    
+    returns-orchestration:
+      debug-mode: true
+      mock-external-apis: true
+      ttl-enabled: false
+    
+    real-time-notifications:
+      debug-mode: true
+      log-messages: true
+      mock-websocket: true
+
+# Test security
+security:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600

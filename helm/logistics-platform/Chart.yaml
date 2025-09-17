@@ -1,0 +1,29 @@
+apiVersion: v2
+name: logistics-platform
+description: A Helm chart for Logistics Intelligence Platform
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - logistics
+  - microservices
+  - spring-boot
+  - vue
+home: https://github.com/dpd-uk/logistics-platform
+sources:
+  - https://github.com/dpd-uk/logistics-platform
+maintainers:
+  - name: DPD UK Development Team
+    email: dev-team@dpd-uk.com
+dependencies:
+  - name: mongodb
+    version: 13.6.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: mongodb.enabled
+  - name: redis
+    version: 17.3.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+  - name: kafka
+    version: 22.1.5
+    repository: https://charts.bitnami.com/bitnami
+    condition: kafka.enabled

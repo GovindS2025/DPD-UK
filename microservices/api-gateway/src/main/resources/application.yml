@@ -1,0 +1,103 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  profiles:
+    active: dev
+  
+  cloud:
+    gateway:
+      routes:
+        - id: eta-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/eta/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: eta-service
+                fallbackUri: forward:/fallback/eta
+        
+        - id: routing-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/routes/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: routing-service
+                fallbackUri: forward:/fallback/routing
+        
+        - id: returns-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/returns/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: returns-service
+                fallbackUri: forward:/fallback/returns
+        
+        - id: notification-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/notifications/**,/ws/**
+          filters:
+            - StripPrefix=1
+        
+        - id: ops-console
+          uri: http://localhost:3000
+          predicates:
+            - Path=/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ops-console
+                fallbackUri: forward:/fallback/console
+      
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestedTokens: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.dpd.uk.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Security configuration
+security:
+  jwt:
+    secret: your-jwt-secret-key
+    expiration: 86400 # 24 hours

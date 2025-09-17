@@ -1,0 +1,177 @@
+# Default values for logistics-platform
+replicaCount: 3
+
+image:
+  repository: logistics-platform
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: logistics.dpd-uk.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: logistics-tls
+      hosts:
+        - logistics.dpd-uk.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# MongoDB configuration
+mongodb:
+  enabled: true
+  auth:
+    enabled: false
+  persistence:
+    enabled: true
+    size: 20Gi
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Kafka configuration
+kafka:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 20Gi
+  zookeeper:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# ETA Service configuration
+etaService:
+  replicaCount: 3
+  image:
+    repository: logistics-eta-service
+    tag: latest
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Routing Service configuration
+routingService:
+  replicaCount: 3
+  image:
+    repository: logistics-routing-service
+    tag: latest
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Returns Service configuration
+returnsService:
+  replicaCount: 3
+  image:
+    repository: logistics-returns-service
+    tag: latest
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Notification Service configuration
+notificationService:
+  replicaCount: 2
+  image:
+    repository: logistics-notification-service
+    tag: latest
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# API Gateway configuration
+apiGateway:
+  replicaCount: 3
+  image:
+    repository: logistics-api-gateway
+    tag: latest
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Ops Console configuration
+opsConsole:
+  replicaCount: 2
+  image:
+    repository: logistics-ops-console
+    tag: latest
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi

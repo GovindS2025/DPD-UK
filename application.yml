@@ -1,0 +1,259 @@
+# Global configuration for Logistics Intelligence Platform
+spring:
+  profiles:
+    active: dev
+  
+  application:
+    name: logistics-platform
+  
+  # Global Jackson configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: UTC
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+  
+  # Global cloud configuration
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          auto-create-topics: true
+          replication-factor: 1
+        streams:
+          binder:
+            configuration:
+              default:
+                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value.serde: org.springframework.kafka.support.serializer.JsonSerde
+                commit.interval.ms: 1000
+                cache.max.bytes.buffering: 10485760
+                auto.offset.reset: earliest
+                processing.guarantee: exactly_once
+
+# Global logging configuration
+logging:
+  level:
+    root: INFO
+    com.dpd.uk: DEBUG
+    org.springframework.cloud: INFO
+    org.springframework.web: INFO
+    org.springframework.data: INFO
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
+
+# Global management configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,configprops
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+      slo:
+        http.server.requests: 50ms, 100ms, 200ms, 500ms
+
+# Global security configuration
+security:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# Global error handling
+error:
+  include-message: always
+  include-binding-errors: always
+  include-stacktrace: on_param
+  include-exception: false
+
+# Global application properties
+app:
+  name: Logistics Intelligence Platform
+  version: 1.0.0
+  description: Modern microservices-based logistics platform with predictive ETA, route optimization, and returns orchestration
+  
+  # External API configurations
+  external:
+    traffic:
+      api-key: ${TRAFFIC_API_KEY:your-traffic-api-key}
+      base-url: ${TRAFFIC_API_URL:https://api.traffic-service.com/v1}
+      timeout: 5000
+      retry-attempts: 3
+      retry-delay: 1000
+    
+    mapping:
+      api-key: ${MAPPING_API_KEY:your-mapping-api-key}
+      base-url: ${MAPPING_API_URL:https://atlas.microsoft.com/map}
+      timeout: 10000
+      retry-attempts: 3
+      retry-delay: 2000
+    
+    openstreetmap:
+      base-url: ${OSM_API_URL:https://routing.openstreetmap.de/routed-car}
+      timeout: 5000
+      retry-attempts: 2
+      retry-delay: 1000
+  
+  # Database configurations
+  database:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/logistics}
+      max-connections: 100
+      connection-timeout: 30000
+      socket-timeout: 30000
+    
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 2000
+      max-connections: 20
+      max-idle: 10
+      min-idle: 5
+  
+  # Kafka configurations
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    security-protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+    sasl-mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
+    sasl-jaas-config: ${KAFKA_SASL_JAAS_CONFIG:}
+    ssl-truststore-location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+    ssl-truststore-password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+    ssl-keystore-location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+    ssl-keystore-password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+  
+  # Monitoring configurations
+  monitoring:
+    prometheus:
+      enabled: true
+      endpoint: /actuator/prometheus
+    
+    jaeger:
+      enabled: true
+      endpoint: ${JAEGER_ENDPOINT:http://localhost:14268/api/traces}
+      service-name: ${JAEGER_SERVICE_NAME:logistics-platform}
+    
+    grafana:
+      enabled: true
+      endpoint: ${GRAFANA_ENDPOINT:http://localhost:3001}
+  
+  # Feature flags
+  features:
+    eta-calculation:
+      enabled: true
+      cache-enabled: true
+      cache-ttl: 900 # 15 minutes
+    
+    route-optimization:
+      enabled: true
+      algorithms:
+        - GENETIC_ALGORITHM
+        - SIMULATED_ANNEALING
+        - TABU_SEARCH
+        - GREEDY
+      default-algorithm: GENETIC_ALGORITHM
+    
+    returns-orchestration:
+      enabled: true
+      ttl-enabled: true
+      auto-approval-enabled: true
+    
+    real-time-notifications:
+      enabled: true
+      websocket-enabled: true
+      sse-enabled: true
+
+---
+# Development profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  # Development database configurations
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/logistics_dev
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+# Development logging
+logging:
+  level:
+    com.dpd.uk: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.data: DEBUG
+
+---
+# Production profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  # Production database configurations
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://mongodb:27017/logistics}
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: 0
+
+# Production logging
+logging:
+  level:
+    com.dpd.uk: INFO
+    org.springframework.cloud: INFO
+    org.springframework.web: WARN
+    org.springframework.data: WARN
+    org.apache.kafka: WARN
+  file:
+    name: /var/log/logistics-platform/application.log
+
+---
+# Test profile
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  # Test database configurations
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/logistics_test
+    redis:
+      host: localhost
+      port: 6379
+      database: 1
+
+# Test logging
+logging:
+  level:
+    com.dpd.uk: DEBUG
+    org.springframework.test: DEBUG

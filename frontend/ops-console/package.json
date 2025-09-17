@@ -1,0 +1,39 @@
+{
+  "name": "logistics-ops-console",
+  "version": "1.0.0",
+  "description": "Real-time operations console for logistics platform",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.2",
+    "@vueuse/core": "^10.5.0",
+    "leaflet": "^1.9.4",
+    "vue-leaflet": "^0.0.1",
+    "chart.js": "^4.4.0",
+    "vue-chartjs": "^5.3.0",
+    "socket.io-client": "^4.7.4",
+    "primevue": "^3.50.0",
+    "primeicons": "^6.0.1",
+    "primeflex": "^3.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "@vue/tsconfig": "^0.4.0",
+    "typescript": "~5.3.0",
+    "vue-tsc": "^1.8.25",
+    "vite": "^5.0.10",
+    "eslint": "^8.56.0",
+    "@vue/eslint-config-typescript": "^12.0.0",
+    "eslint-plugin-vue": "^9.19.2",
+    "@types/leaflet": "^1.9.8"
+  }
+}

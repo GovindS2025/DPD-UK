@@ -1,0 +1,81 @@
+# Development environment configuration
+spring:
+  profiles:
+    active: dev
+  
+  # Development database configurations
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/logistics_dev
+      auto-index-creation: true
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  # Development cloud configuration
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+          replication-factor: 1
+
+# Development logging
+logging:
+  level:
+    com.dpd.uk: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.data: DEBUG
+    org.springframework.kafka: DEBUG
+    org.apache.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
+
+# Development management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Development application properties
+app:
+  external:
+    traffic:
+      api-key: dev-traffic-api-key
+      base-url: https://api.traffic-service-dev.com/v1
+      timeout: 5000
+    
+    mapping:
+      api-key: dev-mapping-api-key
+      base-url: https://atlas.microsoft.com/map
+      timeout: 10000
+  
+  features:
+    eta-calculation:
+      cache-enabled: false
+      debug-mode: true
+    
+    route-optimization:
+      debug-mode: true
+      log-iterations: true
+    
+    returns-orchestration:
+      debug-mode: true
+      mock-external-apis: true
+    
+    real-time-notifications:
+      debug-mode: true
+      log-messages: true

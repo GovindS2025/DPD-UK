@@ -1,0 +1,102 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: routing-service
+  
+  profiles:
+    active: dev
+  
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/logistics_routing
+      auto-index-creation: true
+  
+  redis:
+    host: localhost
+    port: 6379
+    database: 1
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+        streams:
+          binder:
+            configuration:
+              default:
+                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value.serde: org.springframework.kafka.support.serializer.JsonSerde
+      bindings:
+        route-optimized-out:
+          destination: route-optimized
+          contentType: application/json
+        route-update-out:
+          destination: route-updates
+          contentType: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.dpd.uk.routing: DEBUG
+    org.springframework.cloud.stream: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# External API configurations
+external:
+  mapping:
+    api-key: ${MAPPING_API_KEY:your-mapping-api-key}
+    base-url: https://atlas.microsoft.com/map
+    timeout: 10000
+  
+  openstreetmap:
+    base-url: https://routing.openstreetmap.de/routed-car
+    timeout: 5000
+
+# Route optimization configuration
+routing:
+  optimization:
+    algorithm: GENETIC_ALGORITHM
+    max-iterations: 1000
+    population-size: 50
+    mutation-rate: 0.1
+    crossover-rate: 0.8
+    cache-ttl-minutes: 30
+    batch-size: 50
+  
+  constraints:
+    max-route-duration-hours: 8
+    max-route-distance-km: 200
+    max-stops-per-route: 50
+    vehicle-capacity-weight: 1000
+    vehicle-capacity-volume: 10
+  
+  algorithms:
+    available:
+      - GENETIC_ALGORITHM
+      - SIMULATED_ANNEALING
+      - TABU_SEARCH
+      - GREEDY
+    default: GENETIC_ALGORITHM

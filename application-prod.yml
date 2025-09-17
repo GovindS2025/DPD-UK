@@ -1,0 +1,120 @@
+# Production environment configuration
+spring:
+  profiles:
+    active: prod
+  
+  # Production database configurations
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://mongodb:27017/logistics}
+      auto-index-creation: false
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+  
+  # Production cloud configuration
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:kafka:9092}
+          auto-create-topics: false
+          replication-factor: 3
+          security-protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+
+# Production logging
+logging:
+  level:
+    com.dpd.uk: INFO
+    org.springframework.cloud: INFO
+    org.springframework.web: WARN
+    org.springframework.data: WARN
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+  file:
+    name: /var/log/logistics-platform/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
+      total-size-cap: 3GB
+
+# Production management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Production application properties
+app:
+  external:
+    traffic:
+      api-key: ${TRAFFIC_API_KEY}
+      base-url: ${TRAFFIC_API_URL:https://api.traffic-service.com/v1}
+      timeout: 5000
+      retry-attempts: 3
+      retry-delay: 1000
+    
+    mapping:
+      api-key: ${MAPPING_API_KEY}
+      base-url: ${MAPPING_API_URL:https://atlas.microsoft.com/map}
+      timeout: 10000
+      retry-attempts: 3
+      retry-delay: 2000
+  
+  features:
+    eta-calculation:
+      cache-enabled: true
+      cache-ttl: 900
+      debug-mode: false
+    
+    route-optimization:
+      debug-mode: false
+      log-iterations: false
+    
+    returns-orchestration:
+      debug-mode: false
+      mock-external-apis: false
+    
+    real-time-notifications:
+      debug-mode: false
+      log-messages: false
+
+# Production security
+security:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://logistics.dpd-uk.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# Production monitoring
+monitoring:
+  prometheus:
+    enabled: true
+    endpoint: /actuator/prometheus
+  
+  jaeger:
+    enabled: true
+    endpoint: ${JAEGER_ENDPOINT:http://jaeger:14268/api/traces}
+    service-name: ${JAEGER_SERVICE_NAME:logistics-platform}
+  
+  grafana:
+    enabled: true
+    endpoint: ${GRAFANA_ENDPOINT:http://grafana:3000}
